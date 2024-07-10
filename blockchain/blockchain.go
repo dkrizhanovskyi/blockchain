@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-var mu sync.Mutex
+var (
+	mu              sync.Mutex
+	SystemPublicKey string
+)
 
 // Blockchain represents the blockchain with a list of blocks and validators.
 type Blockchain struct {
