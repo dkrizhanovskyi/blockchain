@@ -6,8 +6,11 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 )
+
+var mu sync.Mutex
 
 // Blockchain represents the blockchain with a list of blocks and validators.
 type Blockchain struct {
