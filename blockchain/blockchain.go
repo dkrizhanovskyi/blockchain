@@ -1,4 +1,3 @@
-// Package blockchain provides the implementation of a simple blockchain.
 package blockchain
 
 import (
@@ -7,13 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 )
-
-// SystemPublicKey holds the public key used for system transactions.
-var SystemPublicKey string
-var mu sync.Mutex
 
 // Blockchain represents the blockchain with a list of blocks and validators.
 type Blockchain struct {
@@ -79,8 +73,8 @@ func (bc *Blockchain) SelectValidator() string {
 		totalStake += stake
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	randomPoint := rand.Intn(totalStake)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomPoint := rng.Intn(totalStake)
 
 	currentStake := 0
 	for validator, stake := range bc.Validators {

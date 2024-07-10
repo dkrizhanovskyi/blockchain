@@ -12,28 +12,17 @@ import (
 	"time"
 )
 
-var blockchainInstance *blockchain.Blockchain
-var cache *sync.Map
-var mutex sync.Mutex
-var transactionBuffer []blockchain.Transaction
-
-const maxBufferSize = 5
-
+// User represents a user in the system.
 type User struct {
-	Username     string
-	PasswordHash string
+	Username string
+	Password string
 }
 
-var users = struct {
-	sync.RWMutex
-	m map[string]User
-}{m: make(map[string]User)}
-
+// InitAPIWithCache initializes the API with caching.
 func InitAPIWithCache(bc *blockchain.Blockchain, cacheInstance *sync.Map) {
 	fmt.Println("Initializing API...")
 	blockchainInstance = bc
 	cache = cacheInstance
-	transactionBuffer = []blockchain.Transaction{}
 
 	http.HandleFunc("/blockchain", handleGetBlockchainWithCache)
 	http.HandleFunc("/write", handleWriteBlock)
