@@ -1,3 +1,4 @@
+// Package api provides the HTTP API for interacting with the blockchain.
 package api
 
 import (
@@ -12,11 +13,25 @@ import (
 	"time"
 )
 
+var (
+	blockchainInstance *blockchain.Blockchain
+	cache              *sync.Map
+	mutex              sync.Mutex
+	transactionBuffer  []blockchain.Transaction
+)
+
+const maxBufferSize = 10 // Define the maximum buffer size
+
 // User represents a user in the system.
 type User struct {
-	Username string
-	Password string
+	Username     string
+	PasswordHash string
 }
+
+var users = struct {
+	sync.RWMutex
+	m map[string]User
+}{m: make(map[string]User)}
 
 // InitAPIWithCache initializes the API with caching.
 func InitAPIWithCache(bc *blockchain.Blockchain, cacheInstance *sync.Map) {
@@ -38,6 +53,7 @@ func InitAPIWithCache(bc *blockchain.Blockchain, cacheInstance *sync.Map) {
 	}
 }
 
+// handleGetBlockchainWithCache handles the request to get the blockchain with caching.
 func handleGetBlockchainWithCache(w http.ResponseWriter, r *http.Request) {
 	if cachedBlocks, ok := cache.Load("blockchain"); ok {
 		bytes, err := json.MarshalIndent(cachedBlocks, "", "  ")
