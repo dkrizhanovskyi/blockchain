@@ -62,14 +62,15 @@ func (bc *Blockchain) AddBlock(transactions []Transaction, validator string, sta
 		fmt.Println("Invalid transactions")
 		return
 	}
-	mu.Lock()
-	defer mu.Unlock()
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
 	newBlock := CreateBlock(prevBlock, transactions, validator, stake)
+
+	mu.Lock()
 	if isBlockValid(newBlock, prevBlock) {
 		bc.Blocks = append(bc.Blocks, newBlock)
 		bc.Validators[validator] += stake
 	}
+	mu.Unlock()
 }
 
 // SelectValidator selects a validator based on their stake.
@@ -95,13 +96,20 @@ func (bc *Blockchain) SelectValidator() string {
 
 // validateTransactions validates a list of transactions.
 func (bc *Blockchain) validateTransactions(transactions []Transaction) bool {
+	var wg sync.WaitGroup
+	valid := true
 	for _, tx := range transactions {
-		if !bc.isValidTransaction(tx) {
-			fmt.Printf("Invalid transaction: %+v\n", tx)
-			return false
-		}
+		wg.Add(1)
+		go func(tx Transaction) {
+			defer wg.Done()
+			if !bc.isValidTransaction(tx) {
+				fmt.Printf("Invalid transaction: %+v\n", tx)
+				valid = false
+			}
+		}(tx)
 	}
-	return true
+	wg.Wait()
+	return valid
 }
 
 // isValidTransaction checks if a transaction is valid.

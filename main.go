@@ -1,4 +1,3 @@
-// Package main implements the main entry point for the blockchain server.
 package main
 
 import (
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"sync"
 	"syscall"
 	"time"
@@ -18,36 +18,46 @@ import (
 
 var cache sync.Map
 
-// main is the entry point for the blockchain server.
 func main() {
-	// Generate keys
+	f, err := os.Create("cpu.prof")
+	if err != nil {
+		fmt.Println("could not create CPU profile: ", err)
+		return
+	}
+	if err := pprof.StartCPUProfile(f); err != nil {
+		fmt.Println("could not start CPU profile: ", err)
+		return
+	}
+	defer pprof.StopCPUProfile()
+
+	// Генерация ключей
 	privKey, pubKey, err := crypto.GenerateKeyPair()
 	if err != nil {
 		fmt.Println("Error generating keys:", err)
 		return
 	}
 
-	// Export public key to string
+	// Экспорт публичного ключа в строку
 	pubKeyStr, err := crypto.ExportPublicKey(pubKey)
 	if err != nil {
 		fmt.Println("Error exporting public key:", err)
 		return
 	}
 
-	// Set system public key
+	// Установка системного публичного ключа
 	blockchain.SystemPublicKey = pubKeyStr
 
-	// Create a new blockchain with a genesis block and initial validator stake
+	// Создание блокчейна с генезис-блоком и начальной ставкой валидатора
 	bc := blockchain.NewBlockchain()
-	bc.Validators[pubKeyStr] = 100 // Initial validator stake
+	bc.Validators[pubKeyStr] = 100 // Начальная ставка валидатора
 
-	// Initialize API to interact with the blockchain and node network
+	// Инициализация API для взаимодействия с блокчейном и сетью узлов
 	go api.InitAPIWithCache(bc, &cache)
 
-	// Serve static files
+	// Обслуживание статических файлов
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
-	// Set up TLS to secure connections
+	// Настройка TLS для защиты соединений
 	server := &http.Server{
 		Addr: ":8081",
 		TLSConfig: &tls.Config{
@@ -55,13 +65,13 @@ func main() {
 		},
 	}
 
-	// Start automatic block creation every 30 seconds
+	// Запуск автоматического создания блоков каждые 30 секунд
 	go startAutomaticBlockCreation(bc, privKey, pubKeyStr)
 
-	// Handle server shutdown
+	// Обработка завершения работы сервера
 	go handleShutdown(server)
 
-	// Start the server using TLS
+	// Запуск сервера с использованием TLS
 	fmt.Println("Starting server on :8081")
 	err = server.ListenAndServeTLS("server.crt", "server.key")
 	if err != nil {
@@ -69,7 +79,6 @@ func main() {
 	}
 }
 
-// startAutomaticBlockCreation starts the process of creating blocks automatically every 30 seconds.
 func startAutomaticBlockCreation(bc *blockchain.Blockchain, privKey *ecdsa.PrivateKey, pubKeyStr string) {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
@@ -80,7 +89,6 @@ func startAutomaticBlockCreation(bc *blockchain.Blockchain, privKey *ecdsa.Priva
 	}
 }
 
-// createAutomaticBlock creates a new block with automatic transactions.
 func createAutomaticBlock(bc *blockchain.Blockchain, privKey *ecdsa.PrivateKey, pubKeyStr string) {
 	validator := bc.SelectValidator()
 	if validator == "" {
@@ -102,10 +110,9 @@ func createAutomaticBlock(bc *blockchain.Blockchain, privKey *ecdsa.PrivateKey, 
 	}
 
 	bc.AddBlock(transactions, validator, bc.Validators[validator])
-	cache.Store("blockchain", bc.Blocks) // Cache the blockchain state
+	cache.Store("blockchain", bc.Blocks) // Кеширование состояния блокчейна
 }
 
-// handleShutdown handles server shutdown gracefully.
 func handleShutdown(server *http.Server) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

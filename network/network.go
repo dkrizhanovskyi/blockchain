@@ -1,30 +1,36 @@
-// Package network provides the implementation for managing nodes in the blockchain network.
 package network
 
-import "blockchain/blockchain"
+import (
+	"blockchain/blockchain"
+	"sync"
+)
 
-// Node represents a node in the blockchain network.
+// Node represents a node in the network.
 type Node struct {
 	Address string
 }
 
-// Network represents the blockchain network containing multiple nodes.
+// Network represents the network of nodes.
 type Network struct {
 	Nodes []Node
+	mu    sync.Mutex
 }
 
-// AddNode adds a new node with the given address to the network.
+// AddNode adds a new node to the network.
 func (n *Network) AddNode(address string) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	n.Nodes = append(n.Nodes, Node{Address: address})
 }
 
-// GetNodes returns all the nodes in the network.
+// GetNodes returns all nodes in the network.
 func (n *Network) GetNodes() []Node {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	return n.Nodes
 }
 
-// SyncBlockchain synchronizes the blockchain across all nodes in the network.
-// This function needs to be implemented.
+// SyncBlockchain synchronizes the blockchain with all nodes.
 func (n *Network) SyncBlockchain(blocks []blockchain.Block) {
-	// Implement blockchain synchronization between nodes
+	// Implement blockchain synchronization logic here
 }
