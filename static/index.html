@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags for character set and viewport configuration -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Blockchain Explorer</h1>
+        
+        <!-- Section for loading and displaying the blockchain -->
+        <div class="blockchain-section">
+            <button id="load-blockchain" class="btn">Load Blockchain</button>
+            <div id="blockchain"></div>
+        </div>
+
+        <!-- Section for displaying network nodes -->
+        <div class="network-section">
+            <h2>Network Nodes</h2>
+            <button id="load-nodes" class="btn">Load Nodes</button>
+            <div id="nodes"></div>
+        </div>
+
+        <!-- Section for sending a transaction -->
+        <div class="transaction-section">
+            <h2>Send Transaction</h2>
+            <form id="send-transaction-form">
+                <input type="text" id="sender" placeholder="Sender" required>
+                <input type="text" id="recipient" placeholder="Recipient" required>
+                <input type="number" id="amount" placeholder="Amount" required>
+                <button type="submit" class="btn">Send</button>
+            </form>
+        </div>
+
+        <!-- Section for mining a new block -->
+        <div class="mining-section">
+            <h2>Mine New Block</h2>
+            <form id="mine-block-form">
+                <input type="text" id="recipient-address" placeholder="Recipient Address" required>
+                <input type="number" id="mining-reward" placeholder="Mining Reward" required>
+                <button type="submit" class="btn">Mine</button>
+            </form>
+        </div>
+
+        <!-- Section for user registration and login -->
+        <div class="user-section">
+            <h2>Register</h2>
+            <form id="register-form">
+                <input type="text" id="register-username" placeholder="Username" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <button type="submit" class="btn">Register</button>
+            </form>
+
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+
+        <!-- Section for displaying notifications -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>

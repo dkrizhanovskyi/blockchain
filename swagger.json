@@ -1,0 +1,211 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Blockchain API",
+    "description": "API documentation for the Blockchain project.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8082",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/blockchain": {
+      "get": {
+        "summary": "Get the blockchain",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the blockchain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Block"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/write": {
+      "post": {
+        "summary": "Write a new block",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created a new block"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully registered the user"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully logged in"
+          }
+        }
+      }
+    },
+    "/send": {
+      "post": {
+        "summary": "Send a transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transaction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully sent the transaction"
+          }
+        }
+      }
+    },
+    "/mine": {
+      "post": {
+        "summary": "Mine new coins",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MineRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully mined new coins"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Block": {
+        "type": "object",
+        "properties": {
+          "Index": {
+            "type": "integer"
+          },
+          "Timestamp": {
+            "type": "string"
+          },
+          "Transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "Hash": {
+            "type": "string"
+          },
+          "PrevHash": {
+            "type": "string"
+          },
+          "Validator": {
+            "type": "string"
+          },
+          "Stake": {
+            "type": "integer"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "Sender": {
+            "type": "string"
+          },
+          "Recipient": {
+            "type": "string"
+          },
+          "Amount": {
+            "type": "integer"
+          },
+          "Signature": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "Username": {
+            "type": "string"
+          },
+          "Password": {
+            "type": "string"
+          }
+        }
+      },
+      "MineRequest": {
+        "type": "object",
+        "properties": {
+          "Recipient": {
+            "type": "string"
+          },
+          "Amount": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
