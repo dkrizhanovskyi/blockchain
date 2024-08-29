@@ -1,0 +1,67 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: rust:1.70
+        options: --privileged
+        ports:
+          - 8080:8080
+          - 3001:3001
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.20.x
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Build Go project
+      run: go build -v ./...
+
+    - name: Run Go tests
+      run: go test -v ./...
+
+    - name: Build Rust components
+      run: |
+        cd rust/rust_crypto
+        cargo build --release
+
+    - name: Run Rust tests
+      run: |
+        cd rust/rust_crypto
+        cargo test
+
+    - name: Ensure Rust library is available to Go
+      run: |
+        cp rust/rust_crypto/target/release/librust_crypto.so /usr/local/lib/
+        ldconfig
+
+    - name: Final Go build with Rust integration
+      run: go build -v ./...
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: blockchain-app
+        path: ./blockchain_app

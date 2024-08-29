@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  title: Blockchain API
+  description: API for interacting with the blockchain.
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /getblockchain:
+    get:
+      summary: Retrieve the entire blockchain
+      responses:
+        '200':
+          description: A JSON array of all blocks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Block'
+  /addblock:
+    post:
+      summary: Add a new block to the blockchain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBlockRequest'
+      responses:
+        '200':
+          description: Success message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /block:
+    get:
+      summary: Retrieve a specific block by index
+      parameters:
+        - in: query
+          name: index
+          schema:
+            type: integer
+          required: true
+          description: The index of the block to retrieve
+      responses:
+        '200':
+          description: A JSON object representing the block
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+  /validate:
+    get:
+      summary: Validate the integrity of the blockchain
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    Block:
+      type: object
+      properties:
+        Data:
+          type: string
+        Hash:
+          type: string
+    NewBlockRequest:
+      type: object
+      properties:
+        data:
+          type: string
